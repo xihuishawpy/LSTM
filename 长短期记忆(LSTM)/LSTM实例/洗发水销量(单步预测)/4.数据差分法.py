@@ -8,7 +8,7 @@ from pandas import Series
 """
 # 创建一个差分序列
 def difference(dataset, interval=1):
-	diff = list()
+	diff = []
 	for i in range(interval, len(dataset)):
 		value = dataset[i] - dataset[i - interval]
 		diff.append(value)
@@ -28,7 +28,7 @@ print(series)
 differenced = difference(series, 1)
 print(differenced)
 # invert transform
-inverted = list()
+inverted = []
 for i in range(len(differenced)):
 	value = inverse_difference(series, differenced[i], len(series)-i)
 	inverted.append(value)

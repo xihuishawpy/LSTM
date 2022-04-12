@@ -31,7 +31,7 @@ def timeseries_to_supervised(data, lag=1):
 
 # 构建差分序列
 def difference(dataset, interval=1):
-	diff = list()
+	diff = []
 	for i in range(interval, len(dataset)):
 		value = dataset[i]
 		diff.append(value)
@@ -61,7 +61,7 @@ def scale(train, test):
 def invert_scale(scaler, X, y):
 	# 将x，y转成一个list列表[x,y]->[0.26733207, -0.025524002]
 	# [y]可以将一个数值转化成一个单元素列表
-	new_row = [x for x in X] + [y]
+	new_row = list(X) + [y]
 	#new_row = [X[0]]+[y]
 	# 将列表转化为一个,包含两个元素的一维数组，形状为(2,)->[0.26733207 -0.025524002]
 	array = numpy.array(new_row)
@@ -74,26 +74,26 @@ def invert_scale(scaler, X, y):
 
 # 构建一个LSTM网络模型，并训练
 def fit_lstm(train, batch_size, nb_epoch, neurons):
-    # 将数据对中的X, y拆分开，形状为[23*1]
-    X, y = train[:, 0:-1], train[:, -1]
-    # 将2D数据拼接成3D数据，形状为[23*1*1]
-    X = X.reshape(X.shape[0], 1, X.shape[1])
-    model = Sequential()
-    # neurons是神经元个数，batch_size是样本个数，batch_input_shape是输入形状，
-    # stateful是状态保留
-    # 1.同一批数据反复训练很多次，可保留每次训练状态供下次使用
-    # 2.不同批数据之间有顺序关联，可保留每次训练状态
-    # 3.不同批次数据，数据之间没有关联
-    model.add(LSTM(neurons, batch_input_shape=(batch_size, X.shape[1], X.shape[2]), stateful=True))
-    model.add(Dense(1))
-    # 定义损失函数和优化器
-    model.compile(loss='mean_squared_error', optimizer='adam')
-    for i in range(nb_epoch):
-        # shuffle=False是不混淆数据顺序
-        model.fit(X, y, epochs=10, batch_size=batch_size, verbose=1, shuffle=False)
-        # 每训练完一个轮回，重置一次网络
-        model.reset_states()
-    return model
+	# 将数据对中的X, y拆分开，形状为[23*1]
+	X, y = train[:, 0:-1], train[:, -1]
+	# 将2D数据拼接成3D数据，形状为[23*1*1]
+	X = X.reshape(X.shape[0], 1, X.shape[1])
+	model = Sequential()
+	# neurons是神经元个数，batch_size是样本个数，batch_input_shape是输入形状，
+	# stateful是状态保留
+	# 1.同一批数据反复训练很多次，可保留每次训练状态供下次使用
+	# 2.不同批数据之间有顺序关联，可保留每次训练状态
+	# 3.不同批次数据，数据之间没有关联
+	model.add(LSTM(neurons, batch_input_shape=(batch_size, X.shape[1], X.shape[2]), stateful=True))
+	model.add(Dense(1))
+	# 定义损失函数和优化器
+	model.compile(loss='mean_squared_error', optimizer='adam')
+	for _ in range(nb_epoch):
+		# shuffle=False是不混淆数据顺序
+		model.fit(X, y, epochs=10, batch_size=batch_size, verbose=1, shuffle=False)
+		# 每训练完一个轮回，重置一次网络
+		model.reset_states()
+	return model
 
 # 开始单步预测，model是训练好的模型，batch_size是时间步，X是一个一维数组
 def forecast_lstm(model, batch_size, X):
@@ -121,7 +121,7 @@ supervised = timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
 
 # 将数据分割为训练集和测试集，此时分割的数据集是二维数组
-train, test = supervised_values[0:-testNum], supervised_values[-testNum:]
+train, test = supervised_values[:-testNum], supervised_values[-testNum:]
 
 # 将训练集和测试集都缩放到[-1, 1]之间
 scaler, train_scaled, test_scaled = scale(train, test)
@@ -138,7 +138,7 @@ print(train_reshaped)
 lstm_model.predict(train_reshaped, batch_size=1)
 #print(lstm_model.predict(train_reshaped, batch_size=1))
 # 遍历测试数据，对数据进行单步预测
-predictions = list()
+predictions = []
 for i in range(len(test_scaled)):
 	# 将(12,2)的2D训练集test_scaled拆分成X,y；
 	# 其中X是第i行的0到-1列，形状是(1,)的包含一个元素的一维数组；y是第i行，倒数第1列，是一个数值；

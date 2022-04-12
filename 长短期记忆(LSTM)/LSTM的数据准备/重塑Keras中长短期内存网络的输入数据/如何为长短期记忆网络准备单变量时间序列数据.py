@@ -1,10 +1,7 @@
 from numpy import array
 
-# load...
-data = list()
 n = 50
-for i in range(n):
-    data.append([i + 1, (i + 1) * 10])
+data = [[i + 1, (i + 1) * 10] for i in range(n)]
 data = array(data)
 print(data[:5, :])
 print(data.shape)
@@ -13,7 +10,7 @@ data = data[:, 1]
 print(data.shape)
 print(data)
 
-samples = list()
+samples = []
 length = 2
 # step over the 50 in jumps of 2
 # length表示每次循环跳跃步长为2

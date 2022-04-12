@@ -37,7 +37,7 @@ model.add(LSTM(5, input_shape=(2, 1)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 # 调用网络
-for i in range(500):
+for _ in range(500):
 	X, y = generate_data(n_timesteps)
 	model.fit(X, y, epochs=1, batch_size=1, verbose=2)
 # 评估数据模型

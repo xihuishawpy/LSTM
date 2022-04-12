@@ -38,7 +38,7 @@ model.add(LSTM(5))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 # fit model
-for i in range(500):
+for _ in range(500):
 	X, y = generate_data(n_timesteps)
 	model.fit(X, y, epochs=1, batch_size=1, verbose=2)
 # 评估数据模型

@@ -14,10 +14,10 @@ series = read_csv('shampoo-sales.csv', header=0, parse_dates=[0], index_col=0, s
 # 拆分训练集和测试集
 # 训练数据从0到倒数第12条，测试数据从倒数第12条到最后一条
 X = series.values
-train, test = X[0:-12], X[-12:]
+train, test = X[:-12], X[-12:]
 # walk-forward validation
-history = [x for x in train]
-predictions = list()
+history = list(train)
+predictions = []
 for i in range(len(test)):
 	# make prediction
 	predictions.append(history[-1])

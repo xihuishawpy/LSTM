@@ -19,7 +19,7 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     for i in range(n_in, 0, -1):
         cols.append(df.shift(i))
         names += [('var%d(t-%d)' % (j + 1, i)) for j in range(n_vars)]
-    for i in range(0, n_out, 1):
+    for i in range(n_out):
         cols.append(df.shift(-i))
         if i == 0:
             names += [('var%d(t)' % (j + 1)) for j in range(n_vars)]
@@ -36,11 +36,10 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 def prepare_data(series, n_test, n_lay, n_seq):
     raw_values = series.values
     raw_values = raw_values.reshape(len(raw_values), 1)
-     #转换成四个一组的监督型数据
     supervised = series_to_supervised(raw_values, n_lay, n_seq)
     supervised_values = supervised.values
     # 前3/4作为训练数据，后1/4作为预测 测试数据
-    train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
+    train, test = supervised_values[:-n_test], supervised_values[-n_test:]
     return train, test
 
 
@@ -48,13 +47,13 @@ def prepare_data(series, n_test, n_lay, n_seq):
 # 用上一次观察值作为之后n_seq的预测值
 # 其实只是单纯的把上一次的观测值，重复三次写入一个包含三个元素的数组，作为一个包含三个元素的预测结果
 def persistence(last_ob, n_seq):
-    return [last_ob for i in range(n_seq)]
+    return [last_ob for _ in range(n_seq)]
 
 
 # 评估persistence model
 # 把由
 def make_forcast(train, test, n_lay, n_seq):
-    forcasts = list()
+    forcasts = []
     for i in range(len(test)):
         x, y = test[i, 0:n_lag], test[i, n_lag:]
         # 这里的预测其实就是抄写上一次的观测值，把观测值变成一个数组列表
@@ -82,7 +81,7 @@ def plot_forcasts(series, forcasts, n_test):
     for i in range(len(forcasts)):
         off_s = len(series) - n_test + i - 1
         off_e = off_s + len(forcasts[i]) + 1
-        xaxis = [x for x in range(off_s, off_e)]
+        xaxis = list(range(off_s, off_e))
         yaxis = [series.values[off_s]] + forcasts[i]
         print('xaxis')
         print(xaxis)

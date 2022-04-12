@@ -51,7 +51,10 @@ def lstm(batch):#参数：输入网络批次数目
     input = tf.reshape(X, [-1, input_size])#需要将tensor转成2维进行计算，计算后的结果作为隐藏层的输入
     input_rnn = tf.matmul(input, w_in) + b_in
     input_rnn = tf.reshape(input_rnn, [-1, time_step, rnn_unit])#将tensor转成3维，作为lstm cell的输入
-    cell = tf.nn.rnn_cell.MultiRNNCell([tf.nn.rnn_cell.BasicLSTMCell(rnn_unit) for i in range(lstm_layers)])
+    cell = tf.nn.rnn_cell.MultiRNNCell(
+        [tf.nn.rnn_cell.BasicLSTMCell(rnn_unit) for _ in range(lstm_layers)]
+    )
+
     init_state = cell.zero_state(batch, dtype=tf.float32)
     output_rnn, final_states = tf.nn.dynamic_rnn(cell, input_rnn, initial_state=init_state, dtype=tf.float32)
     output = tf.reshape(output_rnn, [-1, rnn_unit])#作为输出层的输入
@@ -106,7 +109,7 @@ def prediction():
         prev_seq = train_x[-1]
         predict = []
         # 得到之后100个预测结果
-        for i in range(100):
+        for _ in range(100):
             next_seq = sess.run(pred, feed_dict={X: [prev_seq]})
             predict.append(next_seq[-1])
             # 每次得到最后一个时间步的预测结果，与之前的数据加在一起，形成新的测试样本

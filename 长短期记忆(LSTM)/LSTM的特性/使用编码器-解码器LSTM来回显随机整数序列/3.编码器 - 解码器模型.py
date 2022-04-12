@@ -15,7 +15,7 @@ def generate_sequence(length=25):
 
 # 生成一个one hot encode 序列
 def one_hot_encode(sequence, n_unique=100):
-    encoding = list()
+    encoding = []
     for value in sequence:
         vector = [0 for _ in range(n_unique)]
         vector[value] = 1
@@ -65,7 +65,7 @@ model.add(LSTM(150, return_sequences=True, stateful=True))
 model.add(TimeDistributed(Dense(encoded_length, activation='softmax')))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
 # 训练网络 LSTM
-for epoch in range(5000):
+for _ in range(5000):
     # generate new random sequence
     X,y = get_data(n_in, n_out)
     # 每次对网络训练一个周期时长

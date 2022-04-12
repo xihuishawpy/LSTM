@@ -31,7 +31,7 @@ def timeseries_to_supervised(data, lag=1):
 
 # 转换成差分数据
 def difference(dataset, interval=1):
-    diff = list()
+    diff = []
     for i in range(interval, len(dataset)):
         value = dataset[i] - dataset[i - interval]
         diff.append(value)
@@ -59,7 +59,7 @@ def scale(train, test):
 
 # 逆缩放
 def invert_scale(scaler, X, value):
-    new_row = [x for x in X] + [value]
+    new_row = list(X) + [value]
     array = numpy.array(new_row)
     array = array.reshape(1, len(array))
     inverted = scaler.inverse_transform(array)
@@ -80,7 +80,7 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
         # 按照batch_size，一次读取batch_size个数据
         model.fit(X, y, epochs=1, batch_size=batch_size, verbose=0, shuffle=False)
         model.reset_states()
-        print("当前计算次数："+str(i))
+        print(f"当前计算次数：{str(i)}")
     return model
 
 
@@ -104,7 +104,7 @@ supervised = timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
 
 # 数据拆分：训练数据、测试数据，前24行是训练集，后12行是测试集
-train, test = supervised_values[0:-12], supervised_values[-12:]
+train, test = supervised_values[:-12], supervised_values[-12:]
 
 # 数据缩放
 scaler, train_scaled, test_scaled = scale(train, test)
@@ -113,7 +113,7 @@ scaler, train_scaled, test_scaled = scale(train, test)
 
 #重复实验   
 repeats = 30
-error_scores = list()
+error_scores = []
 for r in range(repeats):
     # fit 模型
     lstm_model = fit_lstm(train_scaled, 1, 100, 4)  # 训练数据，batch_size，epoche次数, 神经元个数
@@ -122,7 +122,7 @@ for r in range(repeats):
     lstm_model.predict(train_reshaped, batch_size=1)#用模型对训练数据矩阵进行预测
     # 测试数据的前向验证，实验发现，如果训练次数很少的话，模型回简单的把数据后移，以昨天的数据作为今天的预测值，当训练次数足够多的时候
     # 才会体现出来训练结果
-    predictions = list()
+    predictions = []
     for i in range(len(test_scaled)):
         # 1步长预测
         X, y = test_scaled[i, 0:-1], test_scaled[i, -1]

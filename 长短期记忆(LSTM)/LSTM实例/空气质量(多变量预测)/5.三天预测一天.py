@@ -39,12 +39,12 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     	names += [('var%d(t-%d)' % (j+1, i)) for j in range(n_vars)]
     # forecast sequence (t, t+1, ... t+n)
     # 将一组输出数据加入cols列表（技巧：其中i=0）
-    for i in range(0, n_out):
-    	cols.append(df.shift(-i))
-    	if i == 0:
-    		names += [('var%d(t)' % (j+1)) for j in range(n_vars)]
-    	else:
-    		names += [('var%d(t+%d)' % (j+1, i)) for j in range(n_vars)]
+    for i in range(n_out):
+        cols.append(df.shift(-i))
+        if i == 0:
+        	names += [('var%d(t)' % (j+1)) for j in range(n_vars)]
+        else:
+        	names += [('var%d(t+%d)' % (j+1, i)) for j in range(n_vars)]
     # cols列表(list)中现在有四块经过下移后的数据(即：df(-3),df(-2),df(-1),df)，将四块数据按列 并排合并
     agg = concat(cols, axis=1)
     # 给合并后的数据添加列名

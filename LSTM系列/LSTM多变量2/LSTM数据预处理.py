@@ -17,12 +17,12 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):  # n_in,n_out相�
     for i in range(n_in, 0, -1):
         cols.append(df.shift(i))
         print('shift数据')
-        print(cols[0][0:5])
+        print(cols[0][:5])
         names += [('var%d(t-%d)' % (j + 1, i)) for j in range(n_vars)]
         print('names数据')
-        print(names[0:5])
-        # 预测序列(t, t+1, ... , t+n)
-    for i in range(0, n_out):
+        print(names[:5])
+            # 预测序列(t, t+1, ... , t+n)
+    for i in range(n_out):
         cols.append(df.shift(-i))
         if i == 0:  # t时刻
             names += [('var%d(t)' % (j + 1)) for j in range(n_vars)]
@@ -31,7 +31,7 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):  # n_in,n_out相�
     # 拼接
     agg = concat(cols, axis=1)
     print('拼接')
-    print(agg[0:5])
+    print(agg[:5])
     agg.columns = names
     # 将空值NaN行删除
     if dropnan:
@@ -42,14 +42,14 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):  # n_in,n_out相�
 dataset = read_csv('data_set/air_pollution_new.csv', header=0, index_col=0)
 values = dataset.values
 print('原始数据')
-print(values[0:5])
+print(values[:5])
 
 
 # 由于4列的风向是标签，编码成整数
 encoder = LabelEncoder()  # 简单来说 LabelEncoder 是对不连续的数字或者文本进行编号
 values[:, 4] = encoder.fit_transform(values[:, 4])
 print('标签编码')
-print(values[0:5])
+print(values[:5])
 
 # 使所有数据是float类型
 values = values.astype('float32')
@@ -57,12 +57,12 @@ values = values.astype('float32')
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled = scaler.fit_transform(values)
 print('缩放')
-print(scaled[0:5])
+print(scaled[:5])
 
 # 变成有监督
 reframed = series_to_supervised(scaled, 1, 1)
 print('有监督')
-print(reframed[0:5])
+print(reframed[:5])
 
 # 删除不预测的列
 reframed.drop(reframed.columns[9:16], axis=1, inplace=True)

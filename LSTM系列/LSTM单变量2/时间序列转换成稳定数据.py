@@ -16,7 +16,7 @@ series = read_csv('data_set/shampoo-sales.csv', header=0, parse_dates=[0], index
 # 所谓的去趋势也就是一个说法而已，可以忽略
 # 做差分，去趋势，获得差分序列
 def difference(dataset, interval=1):
-    diff = list()
+    diff = []
     for i in range(interval, len(dataset)):
         value = dataset[i] - dataset[i - interval]  # 当前时间步t的值减去时间步t-interval的值
         diff.append(value)
@@ -36,7 +36,7 @@ differenced = difference(series, 1)
 print(differenced.head())
 
 # 逆处理，从差分逆转得到真实值
-inverted = list()
+inverted = []
 for i in range(len(differenced)):
     value = inverse_difference(series, differenced[i], len(series) - i)
     inverted.append(value)

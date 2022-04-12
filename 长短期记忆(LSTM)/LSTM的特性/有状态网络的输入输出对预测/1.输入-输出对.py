@@ -1,8 +1,8 @@
 # binary encode an input pattern, return a list of binary vectors
 def encode(pattern, n_unique):
-	encoded = list()
+	encoded = []
 	for value in pattern:
-		row = [0.0 for x in range(n_unique)]
+		row = [0.0 for _ in range(n_unique)]
 		row[value] = 1.0
 		encoded.append(row)
 	return encoded

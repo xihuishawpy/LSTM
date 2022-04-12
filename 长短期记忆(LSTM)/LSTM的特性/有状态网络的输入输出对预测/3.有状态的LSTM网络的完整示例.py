@@ -5,9 +5,9 @@ from keras.layers import LSTM
 
 # 数据转码成one-hot编码
 def encode(pattern, n_unique):
-	encoded = list()
+	encoded = []
 	for value in pattern:
-		row = [0.0 for x in range(n_unique)]
+		row = [0.0 for _ in range(n_unique)]
 		row[value] = 1.0
 		encoded.append(row)
 	return encoded
@@ -50,12 +50,11 @@ n_features = n_unique #特征值
 model = Sequential()
 # 网络中间层节点20个，每次输入样本1个，步长为1，特征值为5，stateful=True表明记录当前模型状态，作为为下一次训练网络时的前置状态
 model.add(LSTM(20, batch_input_shape=(n_batch, 1, n_features), stateful=True))
-# 激活函数为sigmoid函数，n_unique为输入数据维度/输入特征值数量
-model.add(Dense(n_unique, activation='sigmoid'))
+model.add(Dense(n_features, activation='sigmoid'))
 # loss为交叉熵损失函数，优化器是adam
 model.compile(loss='binary_crossentropy', optimizer='adam')
 # 训练LSTM网络，本文的网络训练方法是，每次网络训练一个周期并记住当前网络状态，并将当前网络状态作为下次网络训练的初始状态带入
-for i in range(650):
+for _ in range(650):
 	# 每次训练一个样本，一个训练周期，verbose=1表示打印网络执行状态，shuffle=False不打乱训练数据的顺序
 	model.fit(seq1X, seq1Y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
 	# 我们对这批数据训练650次，可以理解为有650条数据，而这650条数据都是独立的，之间并没有顺序关联，所以每次都重置网络状态

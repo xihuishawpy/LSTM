@@ -28,7 +28,7 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
         cols.append(df.shift(i))
         names += [('var%d(t-%d)' % (j + 1, i)) for j in range(n_vars)]
     # 转换为监督型数据的预测序列 每四个一组，对应 var1(t-1)，var1(t)，var1(t+1)，var1(t+2)
-    for i in range(0, n_out):
+    for i in range(n_out):
         cols.append(df.shift(-i))
         if i == 0:
             names += [('var%d(t)' % (j + 1)) for j in range(n_vars)]
@@ -46,7 +46,7 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 
 # 对传入的数列做差分操作，相邻两值相减
 def difference(dataset, interval=1):
-    diff = list()
+    diff = []
     for i in range(interval, len(dataset)):
         value = dataset[i] - dataset[i - interval]
         diff.append(value)
@@ -69,7 +69,7 @@ def prepare_data(series, n_test, n_lag, n_seq):
     supervised = series_to_supervised(scaled_values, n_lag, n_seq)
     supervised_values = supervised.values
     # 分割为测试数据和训练数据
-    train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
+    train, test = supervised_values[:-n_test], supervised_values[-n_test:]
     return scaler, train, test
 
 
@@ -84,7 +84,7 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
     model.add(Dense(y.shape[1]))
     model.compile(loss='mean_squared_error', optimizer='adam')
     # 调用网络，迭代数据对神经网络进行训练，最后输出训练好的网络模型
-    for i in range(nb_epoch):
+    for _ in range(nb_epoch):
         model.fit(X, y, epochs=1, batch_size=n_batch, verbose=0, shuffle=False)
         model.reset_states()
     return model
@@ -97,12 +97,12 @@ def forecast_lstm(model, X, n_batch):
     # 开始预测
     forecast = model.predict(X, batch_size=n_batch)
     # 结果转换成数组
-    return [x for x in forecast[0, :]]
+    return list(forecast[0, :])
 
 
 # 利用训练好的网络模型，对测试数据进行预测
 def make_forecasts(model, n_batch, train, test, n_lag, n_seq):
-    forecasts = list()
+    forecasts = []
     # 预测方式是用一个X值预测出后三步的Y值
     for i in range(len(test)):
         X, y = test[i, 0:n_lag], test[i, n_lag:]
@@ -116,17 +116,15 @@ def make_forecasts(model, n_batch, train, test, n_lag, n_seq):
 # 对预测后的缩放值（-1，1）进行逆变换
 def inverse_difference(last_ob, forecast):
     # invert first forecast
-    inverted = list()
-    inverted.append(forecast[0] + last_ob)
+    inverted = [forecast[0] + last_ob]
     # propagate difference forecast using inverted first value
-    for i in range(1, len(forecast)):
-        inverted.append(forecast[i] + inverted[i - 1])
+    inverted.extend(forecast[i] + inverted[i - 1] for i in range(1, len(forecast)))
     return inverted
 
 
 # 对预测完成的数据进行逆变换
 def inverse_transform(series, forecasts, scaler, n_test):
-    inverted = list()
+    inverted = []
     for i in range(len(forecasts)):
         # create array from forecast
         forecast = array(forecasts[i])
@@ -161,7 +159,7 @@ def plot_forecasts(series, forecasts, n_test):
     for i in range(len(forecasts)):
         off_s = len(series) - n_test + i - 1
         off_e = off_s + len(forecasts[i]) + 1
-        xaxis = [x for x in range(off_s, off_e)]
+        xaxis = list(range(off_s, off_e))
         yaxis = [series.values[off_s]] + forecasts[i]
         pyplot.plot(xaxis, yaxis, color='red')
     # show the plot

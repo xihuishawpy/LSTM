@@ -82,7 +82,7 @@ def lstm(X):
     input = tf.reshape(X, [-1, input_size])  # 需要将tensor转成2维进行计算，计算后的结果作为隐藏层的输入
     input_rnn = tf.matmul(input, w_in) + b_in
     input_rnn = tf.reshape(input_rnn, [-1, time_step, rnn_unit])  # 将tensor转成3维，作为lstm cell的输入
-    cell = tf.nn.rnn_cell.MultiRNNCell([lstmCell() for i in range(lstm_layers)])
+    cell = tf.nn.rnn_cell.MultiRNNCell([lstmCell() for _ in range(lstm_layers)])
     init_state = cell.zero_state(batch_size, dtype=tf.float32)
     output_rnn, final_states = tf.nn.dynamic_rnn(cell, input_rnn, initial_state=init_state, dtype=tf.float32)
     output = tf.reshape(output_rnn, [-1, rnn_unit])

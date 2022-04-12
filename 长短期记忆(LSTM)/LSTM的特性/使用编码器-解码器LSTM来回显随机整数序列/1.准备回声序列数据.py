@@ -10,7 +10,7 @@ def generate_sequence(length=25):
 
 # 生成一个one hot encode 序列
 def one_hot_encode(sequence, n_unique=100):
-	encoding = list()
+	encoding = []
 	for value in sequence:
 		vector = [0 for _ in range(n_unique)]
 		vector[value] = 1

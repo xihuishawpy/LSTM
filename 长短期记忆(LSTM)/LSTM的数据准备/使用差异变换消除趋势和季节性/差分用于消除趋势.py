@@ -1,10 +1,8 @@
 # 创建一个差分序列
 def difference(dataset, interval=1):
-	diff = list()
-	for i in range(interval, len(dataset)):
-		value = dataset[i] - dataset[i - interval]
-		diff.append(value)
-	return diff
+	return [
+	    dataset[i] - dataset[i - interval] for i in range(interval, len(dataset))
+	]
 
 # 差分的逆转换
 def inverse_difference(last_ob, value):

@@ -19,7 +19,7 @@ series = read_csv('data_set/shampoo-sales.csv', header=0, parse_dates=[0], index
 
 # 分成训练和测试集合，前24列给训练集，后12行给测试集
 X = series.values
-train, test = X[0:-12], X[-12:]
+train, test = X[:-12], X[-12:]
 
 '''
 步进验证模型:
@@ -30,9 +30,9 @@ train, test = X[0:-12], X[-12:]
 3、加入的测试数据作为下一次迭代的训练数据
 '''
 #把数组train赋值给一个history列表
-history = [x for x in train]
+history = list(train)
 #创建一个predictions列表，这个列表记录了观测值，创建一个predictions数组中第n个元素，对应test数组中第n-1个元素
-predictions = list()
+predictions = []
 for i in range(len(test)):
     predictions.append(history[-1])  # history[-1],就是执行预测，这里我们只是假设predictions数组就是我们预测的结果
     history.append(test[i])  # 将新的测试数据加入模型
